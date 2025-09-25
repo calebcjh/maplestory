@@ -1,0 +1,65 @@
+<html>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <script src="octopus.js"></script>
+    <script src="https://cdn.plot.ly/plotly-3.1.0.min.js"></script>
+    <script>
+      window.addEventListener('load', () => {
+        document.getElementById('go').addEventListener('click', () => {
+          const level = parseInt(document.getElementById('lvl').value);
+          const target = parseInt(document.getElementById('target').value);
+          const taps = parseInt(document.getElementById('taps').value);
+          const results = query(level, taps, target);
+          Plotly.newPlot('results', [{
+            x: ['', 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            y: results,
+            type: 'bar'
+          }], {
+            width: 400,
+            height: 400
+          });
+        });
+      });
+    </script>
+    <style>
+      body, input, button {
+        font-family: monospace;
+      }
+      body {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+      }
+      span {
+        display: inline-block;
+        margin: 0 5px 5px 0;
+        text-align: right;
+        width: 150px;
+      }
+      input {
+        width: 50px;
+      }
+      button {
+        text-align: center;
+        width: 205px;
+      }
+      div#contents {
+        padding: 20px 72.5px 0 72.5px;
+        width: 205px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="contents">
+      <span>Current Level:</span><input id="lvl" type="number" min="1" max="9" value="1"><br>
+      <span>Target Level:</span><input id="target" type="number" min="1" max="9" value="9"><br>
+      <span>Taps remaining:</span><input id="taps" type="number" max="100" value="100"><br>
+      <button id="go">Should I Tap My Octopus?</button><br>
+    </div>
+    <div id="results"></div>
+  </body>
+</html>
