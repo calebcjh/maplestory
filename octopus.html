@@ -1,23 +1,92 @@
 <html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <head>
-    <title>Should I Tap My Octopus?</title>
     <script src="octopus.js"></script>
-    <script src="https://cdn.plot.ly/plotly-3.1.0.min.js"></script>
+    <script src='https://cdn.plot.ly/plotly-3.1.0.min.js'></script>
     <script>
+      function processTapsResults(result) {
+        const tickvals = Array.from({length: result.distribution.length + 1}, (_, i) => i);
+        const ticktext = Array.from({length: result.distribution.length + 1},
+            (_, i) => i == 
+                result.distribution.length ? 
+                'fail' :
+                (result.distribution.length - i - 1).toString());
+        const values = result.distribution.slice(0).reverse();
+        values.push(result.fail);
+
+        if (values.length < 16) {
+          return [tickvals, ticktext, values];
+        }
+
+        const bucketSize = Math.ceil(values.length / 15);
+        const remainder = (values.length - 1) % bucketSize;
+        const newTicktext = [], newValues = [];
+
+        if (remainder) {
+          newTicktext.push(ticktext.slice(0, remainder).reduce((a, c) => {
+            return {
+              min: Math.min(c, a.min),
+              max: Math.max(c, a.max)
+            };
+          }, {
+            min: Infinity,
+            max: -Infinity
+          }));
+          newValues.push(values.slice(0, remainder).reduce((a, b) => a + b, 0));
+        }
+
+        for (let i = remainder; i < values.length - 1; i+= bucketSize) {
+          newTicktext.push(ticktext.slice(i, i + bucketSize).reduce((a, c) => {
+            return {
+              min: Math.min(c, a.min),
+              max: Math.max(c, a.max)
+            };
+          }, {
+            min: Infinity,
+            max: -Infinity
+          }));
+          newValues.push(values.slice(i, i + bucketSize).reduce((a, b) => a + b, 0));
+        }
+
+        newTicktext.push(ticktext[ticktext.length - 1]);
+        newValues.push(values[values.length - 1]);
+
+        const newTickvals = Array.from({length: newValues.length}, (_, i) => i);
+
+        return [newTickvals, newTicktext.map(p => p.max ? p.min == p.max ? p.min : `${p.min} - ${p.max}` : p), newValues];
+      }
+
       window.addEventListener('load', () => {
         document.getElementById('go').addEventListener('click', () => {
           const level = parseInt(document.getElementById('lvl').value);
           const target = parseInt(document.getElementById('target').value);
           const taps = parseInt(document.getElementById('taps').value);
-          const results = query(level, taps, target);
-          Plotly.newPlot('results', [{
+
+          const levelDist = genLvlsDist(level, taps, target);
+          Plotly.newPlot('levelDist', [{
             x: ['', 1, 2, 3, 4, 5, 6, 7, 8, 9],
-            y: results,
+            y: levelDist,
             type: 'bar'
           }], {
             width: 400,
-            height: 400
+            height: 350,
+            xaxis: {title: {text: 'level'}}
+          });
+
+          const [tickvals, ticktext, values] = processTapsResults(genTapsDist(level, taps, target));
+          Plotly.newPlot('tapsDist', [{
+            x: tickvals,
+            y: values,
+            type: 'bar'
+          }], {
+            width: 400,
+            height: 350,
+            xaxis: {
+              title: {text: 'taps remaining'},
+              tickvals: tickvals,
+              ticktext: ticktext,
+              tickmode: 'array'
+            }
           });
         });
       });
@@ -61,6 +130,7 @@
       <span>Taps remaining:</span><input id="taps" type="number" max="100" value="100"><br>
       <button id="go">Should I Tap My Octopus?</button><br>
     </div>
-    <div id="results"></div>
+    <div id="levelDist"></div>
+    <div id="tapsDist"></div>
   </body>
 </html>
