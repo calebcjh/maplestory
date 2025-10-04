@@ -72,6 +72,10 @@
             height: 350,
             xaxis: {title: {text: 'level'}}
           });
+          const reward = expectedRewards(levelDist);
+          document.getElementById('frag').innerHTML = Math.round(reward.frag * 100) / 100;
+          document.getElementById('erda').innerHTML = Math.round(reward.erda * 100) / 100;
+          document.getElementById('exp').innerHTML = Math.round(reward.exp * 100) / 100;
 
           const [tickvals, ticktext, values] = processTapsResults(genTapsDist(level, taps, target));
           Plotly.newPlot('tapsDist', [{
@@ -121,6 +125,12 @@
         padding: 20px 72.5px 0 72.5px;
         width: 205px;
       }
+      b {
+        display: inline-block;
+        height: 30px;
+        margin-top: -8px;
+        vertical-align: middle;
+      }
     </style>
   </head>
   <body>
@@ -129,6 +139,11 @@
       <span>Target Level:</span><input id="target" type="number" min="1" max="9" value="9"><br>
       <span>Taps remaining:</span><input id="taps" type="number" max="100" value="100"><br>
       <button id="go">Should I Tap My Octopus?</button><br>
+    </div>
+    <div id="rewards">
+      <b id="frag">?</b><img src="https://media.maplestorywiki.net/yetidb/Etc_Sol_Erda_Fragment_%28Full_Size%29.png" style="height: 30px" />
+      <b id="erda">?</b><img src="https://media.maplestorywiki.net/yetidb/Use_Sol_Erda.png"  style="height: 25px; margin: 2.5px" />
+      <b id="exp">?</b><img src="https://pub-37581592c5a045f3ad8b1881608a2769.r2.dev/images%2Fitems%2Fuse%2Fadvanced-exp-ticket.png" style="height: 20px; margin: 5px" />
     </div>
     <div id="levelDist"></div>
     <div id="tapsDist"></div>
