@@ -14,6 +14,12 @@ const OUTCOMES = [
 
 const INCR = 0, STAY = 1, DECR = 2, BOOM = 3;
 
+const REWARDS = {
+  frag: [undefined, 0, 1, 3, 6, 10, 20, 50, 150, 300],
+  erda: [undefined, 0, 0.04, 0.12, 0.24, 0.4, 0.6, 1, 4, 8],
+  exp: [undefined, 0, 20, 60, 120, 200, 300, 600, 2000, 6000]
+};
+
 const lvlsCache = new Map();
 
 function genKey(level, taps, target) {
@@ -53,6 +59,15 @@ function genLvlsDist(level, taps, target) {
 
   lvlsCache.set(key, result);
   return result;
+}
+
+function expectedRewards(distribution) {
+  const sump = (arr) => arr.map((e, i) => e ? e * distribution[i] : 0).reduce((a, b) => a + b, 0);
+  return {
+    frag: sump(REWARDS.frag),
+    erda: sump(REWARDS.erda),
+    exp: sump(REWARDS.exp)
+  };
 }
 
 const tapsCache = new Map();
