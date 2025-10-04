@@ -62,7 +62,8 @@ function genLvlsDist(level, taps, target) {
 }
 
 function expectedRewards(distribution) {
-  const sump = (arr) => arr.map((e, i) => e ? e * distribution[i] : 0).reduce((a, b) => a + b, 0);
+  const sump = (arr) => arr.map((e, i) =>
+      e && distribution[i] ? e * distribution[i] : 0).reduce((a, b) => a + b, 0);
   return {
     frag: sump(REWARDS.frag),
     erda: sump(REWARDS.erda),
